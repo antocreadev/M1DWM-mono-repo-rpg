@@ -1,14 +1,24 @@
-[project]
-name = "fastapi-rpg"
-version = "0.1.0"
-description = "FastAPI RPG board game"
-requires-python = ">=3.8"
+[tool.poetry]
+name = "rpg-game-api"
+version = "1.0.0"
+description = "API pour le jeu de rôle RPG avec authentification et gestion des personnages"
+authors = ["Your Name <your.email@example.com>"]
 
-dependencies = [
-    "fastapi",
-    "uvicorn[standard]",
-    "sqlalchemy",
-]
+[tool.poetry.dependencies]
+python = "^3.9"
+fastapi = "^0.104.0"
+uvicorn = "^0.24.0"
+sqlalchemy = "^2.0.23"
+pydantic = { extras = ["email"], version = "^2.4.2" }
+passlib = { extras = ["bcrypt"], version = "^1.7.4" }
+python-jose = { extras = ["cryptography"], version = "^3.3.0" }
+python-multipart = "^0.0.6"
 
-[tool.uv]
-python = "3.11"
+[tool.poetry.dev-dependencies]
+pytest = "^7.4.0"
+black = "^23.9.1"
+isort = "^5.12.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
