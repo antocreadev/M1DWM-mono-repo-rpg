@@ -1,0 +1,38 @@
+<app-modal
+  [isOpen]="isOpen"
+  [title]="'Inventaire'"
+  [actionLabel]="selectedItem ? 'Utiliser' : 'Fermer'"
+  (onClose)="closeModal()"
+  (onAction)="selectedItem ? handleUseItem() : closeModal()"
+>
+  <p *ngIf="filteredInventory.length === 0" class="text-gray-500 text-center py-4">
+    {{ inCombat ? 'Aucun objet utilisable en combat' : 'Votre inventaire est vide' }}
+  </p>
+
+  <div *ngIf="filteredInventory.length > 0" class="space-y-2 max-h-[60vh] overflow-y-auto pr-2">
+    <div
+      *ngFor="let item of filteredInventory"
+      class="p-3 border rounded-lg cursor-pointer transition-colors"
+      [ngClass]="{
+        'bg-blue-50 border-blue-300': selectedItem === item,
+        'hover:bg-gray-50': selectedItem !== item
+      }"
+      (click)="selectedItem = item"
+    >
+      <div class="flex items-start">
+        <div class="mr-3 mt-1 text-xl">{{ renderIcon(item.type) }}</div>
+        <div class="flex-1">
+          <h4 class="font-medium">{{ item.name }}</h4>
+          <p class="text-sm text-gray-600">{{ item.description }}</p>
+          <p
+            *ngIf="item.effect?.uses && item.effect?.currentUses"
+            class="text-xs text-gray-500 mt-1"
+          >
+            Utilisations restantes: {{ item.effect.currentUses }}/{{ item.effect.uses }}
+          </p>
+        </div>
+        <div class="text-2xl">{{ item.icon }}</div>
+      </div>
+    </div>
+  </div>
+</app-modal>

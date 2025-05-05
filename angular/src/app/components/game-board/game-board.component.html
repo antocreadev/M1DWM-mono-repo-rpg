@@ -1,0 +1,32 @@
+<div class="grid grid-cols-7 gap-1 p-4 bg-gray-100 rounded-lg">
+  @for (i of rows; track i) {
+    @for (j of cols; track j) {
+      @if (isEdge(i, j)) {
+        <div
+          [class]="getTileClasses(i, j)"
+          [class.ring-4]="getTile(i, j)?.isHighlighted"
+          [class.ring-yellow-400]="getTile(i, j)?.isHighlighted"
+          [class.ring-opacity-75]="getTile(i, j)?.isHighlighted"
+        >
+          @if (getTile(i, j)?.isActive) {
+            <div
+              [class]="'w-8 h-8 rounded-full flex items-center justify-center text-white font-bold animate-bounce bg-' + character?.color + '-600'"
+            >
+              P
+            </div>
+          }
+          @if (!getTile(i, j)?.isActive && getTile(i, j)) {
+            <app-tile-icon [type]="getTile(i, j)?.type"></app-tile-icon>
+          }
+          @if (!getTile(i, j)) {
+            <span class="text-xs text-gray-400">{{i}},{{j}}</span>
+          }
+        </div>
+      } @else {
+        <div class="w-16 h-16 border border-gray-200 bg-white">
+          <span class="text-xs text-gray-300">{{i}},{{j}}</span>
+        </div>
+      }
+    }
+  }
+</div>
