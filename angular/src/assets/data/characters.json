@@ -1,0 +1,30 @@
+[
+  {
+    "id": "magician",
+    "name": "Magicien",
+    "color": "blue",
+    "power": "magic",
+    "description": "Attaques magiques puissantes",
+    "damage": 20,
+    "baseDamage": 15
+  },
+  {
+    "id": "warrior",
+    "name": "Guerrier",
+    "color": "red",
+    "power": "strength",
+    "description": "Force physique supérieure",
+    "damage": 25,
+    "baseDamage": 20
+  },
+  {
+    "id": "vampire",
+    "name": "Vampire",
+    "color": "gray",
+    "power": "lifesteal",
+    "description": "Vol de vie",
+    "damage": 15,
+    "baseDamage": 12,
+    "lifeStealRatio": 0.3
+  }
+]

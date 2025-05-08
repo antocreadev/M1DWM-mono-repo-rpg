@@ -1,0 +1,20 @@
+{
+  "colors": {
+    "start": "bg-green-500",
+    "item": "bg-amber-400",
+    "enemy": "bg-red-500",
+    "heal": "bg-blue-400",
+    "trap": "bg-purple-500",
+    "teleport": "bg-indigo-500",
+    "empty": "bg-gray-300"
+  },
+  "descriptions": {
+    "start": "Case de départ et d'arrivée. Terminez le tour complet pour gagner !",
+    "item": "Case d'objet. Vous y trouverez un équipement qui pourra vous aider.",
+    "enemy": "Case d'ennemi. Préparez-vous au combat !",
+    "heal": "Case de soin. Vous récupérez des points de vie.",
+    "trap": "Case piège. Attention aux dégâts !",
+    "teleport": "Case de téléportation. Vous serez transporté à un autre endroit du plateau.",
+    "empty": "Case vide. Il ne se passe rien ici."
+  }
+}

@@ -1,13 +1,27 @@
 import { Injectable } from '@angular/core';
-import { TILE_TYPES, ITEM_TYPES, ENEMY_TYPES, TILE_DESCRIPTIONS } from '../constants/game-constants';
-import { Tile, TileType } from '../types/game-types';
+import { Tile, TileType, ItemType, EnemyType } from '../types/game-types';
+import { GameDataService } from './game-data.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BoardService {
+  private tileTypes: Record<string, TileType> = {};
+  private itemTypes: ItemType[] = [];
+  private enemyTypes: EnemyType[] = [];
+  private tileDescriptions: Record<TileType, string> = {} as Record<TileType, string>;
 
-  constructor() { }
+  constructor(private gameDataService: GameDataService) {
+    // Initialize with default values from the service
+    this.tileTypes = this.gameDataService.getTileTypes();
+    this.itemTypes = this.gameDataService.getItemTypes();
+    this.enemyTypes = this.gameDataService.getEnemyTypes();
+
+    // Load tile descriptions
+    this.gameDataService.getTileDescriptions().subscribe(descriptions => {
+      this.tileDescriptions = descriptions;
+    });
+  }
 
   // Création du plateau de jeu
   createBoard(): Tile[] {
@@ -54,18 +68,18 @@ export class BoardService {
 
   private determineTileType(index: number, totalTiles: number): TileType {
     if (index === 0) {
-      return TILE_TYPES.START;
+      return this.tileTypes['START'];
     }
 
     const randomValue = Math.random();
 
-    if (randomValue < 0.25) return TILE_TYPES.ITEM;
-    if (randomValue < 0.5) return TILE_TYPES.ENEMY;
-    if (randomValue < 0.65) return TILE_TYPES.HEAL;
-    if (randomValue < 0.8) return TILE_TYPES.TRAP;
-    if (randomValue < 0.95) return TILE_TYPES.TELEPORT;
+    if (randomValue < 0.25) return this.tileTypes['ITEM'];
+    if (randomValue < 0.5) return this.tileTypes['ENEMY'];
+    if (randomValue < 0.65) return this.tileTypes['HEAL'];
+    if (randomValue < 0.8) return this.tileTypes['TRAP'];
+    if (randomValue < 0.95) return this.tileTypes['TELEPORT'];
 
-    return TILE_TYPES.EMPTY;
+    return this.tileTypes['EMPTY'];
   }
 
   private createTile(id: number, type: TileType, row: number, col: number, totalTiles: number): Tile {
@@ -76,16 +90,16 @@ export class BoardService {
       col,
       isActive: id === 0, // La première case est active au début
       data: {
-        itemType: type === TILE_TYPES.ITEM
-          ? ITEM_TYPES[Math.floor(Math.random() * ITEM_TYPES.length)]
+        itemType: type === this.tileTypes['ITEM']
+          ? this.itemTypes[Math.floor(Math.random() * this.itemTypes.length)]
           : undefined,
-        enemyType: type === TILE_TYPES.ENEMY
-          ? ENEMY_TYPES[Math.floor(Math.random() * ENEMY_TYPES.length)]
+        enemyType: type === this.tileTypes['ENEMY']
+          ? this.enemyTypes[Math.floor(Math.random() * this.enemyTypes.length)]
           : undefined,
-        destination: type === TILE_TYPES.TELEPORT
+        destination: type === this.tileTypes['TELEPORT']
           ? Math.floor(Math.random() * totalTiles)
           : undefined,
-        description: TILE_DESCRIPTIONS[type],
+        description: this.tileDescriptions[type],
       }
     };
   }

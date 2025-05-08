@@ -1,1 +1,42 @@
-<router-outlet />
+<header class="bg-indigo-600 text-white p-4">
+  <div class="container mx-auto flex justify-between items-center">
+    <h1 class="text-xl font-bold">RPG Board Game</h1>
+
+    <div class="flex items-center space-x-4">
+      <ng-container *ngIf="(currentUser$ | async) as user; else loginButtons">
+        <span class="text-sm">Welcome, {{ user.username }}</span>
+        <a
+          routerLink="/scores"
+          class="px-3 py-1 bg-green-500 hover:bg-green-400 rounded text-sm"
+        >
+          Mes Scores
+        </a>
+        <button
+          (click)="logout()"
+          class="px-3 py-1 bg-red-500 hover:bg-red-600 rounded text-sm"
+        >
+          Logout
+        </button>
+      </ng-container>
+
+      <ng-template #loginButtons>
+        <a
+          routerLink="/login"
+          class="px-3 py-1 bg-indigo-500 hover:bg-indigo-400 rounded text-sm"
+        >
+          Login
+        </a>
+        <a
+          routerLink="/register"
+          class="px-3 py-1 bg-green-500 hover:bg-green-400 rounded text-sm"
+        >
+          Register
+        </a>
+      </ng-template>
+    </div>
+  </div>
+</header>
+
+<main>
+  <router-outlet />
+</main>

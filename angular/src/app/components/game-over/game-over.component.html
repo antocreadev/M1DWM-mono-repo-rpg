@@ -11,12 +11,23 @@
     <p>Personnage : {{ character?.type }}</p>
     <p>Points de vie restants : {{ health }}</p>
     <p>Objets collectés : {{ inventory.length }}</p>
+    <p class="mt-4 text-lg font-bold">Score final : {{ score }}</p>
+    <p *ngIf="scoreSaved" class="text-green-600 text-sm mt-1">Score enregistré !</p>
   </div>
 
-  <button
-    (click)="onRestart.emit()"
-    class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold"
-  >
-    Rejouer
-  </button>
+  <div class="flex space-x-4">
+    <button
+      (click)="onRestart.emit()"
+      class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold"
+    >
+      Rejouer
+    </button>
+
+    <button
+      (click)="viewScores()"
+      class="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold"
+    >
+      Voir les scores
+    </button>
+  </div>
 </div>

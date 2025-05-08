@@ -1,0 +1,64 @@
+<div class="flex flex-col items-center p-6 bg-gray-100 min-h-screen">
+  <h1 class="text-3xl font-bold mb-4">Mes Scores</h1>
+
+  <div class="w-full max-w-4xl bg-white rounded-lg shadow-lg p-6 mb-6">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-semibold">Historique des parties</h2>
+      <button
+        (click)="clearScores()"
+        class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm"
+      >
+        Effacer l'historique
+      </button>
+    </div>
+
+    <ng-container *ngIf="(scores$ | async) as scores">
+      <div *ngIf="scores.length > 0; else noScores">
+        <div class="overflow-x-auto">
+          <table class="min-w-full bg-white">
+            <thead>
+              <tr class="bg-gray-100 text-gray-700">
+                <th class="py-2 px-4 text-left">Date</th>
+                <th class="py-2 px-4 text-left">Personnage</th>
+                <th class="py-2 px-4 text-left">Santé</th>
+                <th class="py-2 px-4 text-left">Objets</th>
+                <th class="py-2 px-4 text-left">Résultat</th>
+                <th class="py-2 px-4 text-left">Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let score of scores" class="border-b hover:bg-gray-50">
+                <td class="py-2 px-4">{{ formatDate(score.date) }}</td>
+                <td class="py-2 px-4">{{ score.characterType }}</td>
+                <td class="py-2 px-4">{{ score.health }}</td>
+                <td class="py-2 px-4">{{ score.itemsCollected }}</td>
+                <td class="py-2 px-4">
+                  <span
+                    [class]="score.won ? 'text-green-600' : 'text-red-600'"
+                  >
+                    {{ score.won ? 'Victoire' : 'Défaite' }}
+                  </span>
+                </td>
+                <td class="py-2 px-4 font-bold">{{ score.score }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <ng-template #noScores>
+        <div class="text-center py-8 text-gray-500">
+          <p>Vous n'avez pas encore de scores enregistrés.</p>
+          <p class="mt-2">Jouez une partie pour voir vos scores apparaître ici !</p>
+        </div>
+      </ng-template>
+    </ng-container>
+  </div>
+
+  <a
+    routerLink="/"
+    class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold"
+  >
+    Retour au jeu
+  </a>
+</div>

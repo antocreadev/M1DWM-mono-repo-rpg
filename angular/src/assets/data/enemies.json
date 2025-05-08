@@ -1,0 +1,27 @@
+{
+  "goblin": {
+    "name": "Gobelin",
+    "description": "Un petit monstre vicieux qui attaque en groupe.",
+    "weakness": "physical"
+  },
+  "skeleton": {
+    "name": "Squelette",
+    "description": "Un mort-vivant résistant aux attaques physiques.",
+    "weakness": "magic"
+  },
+  "ghost": {
+    "name": "Fantôme",
+    "description": "Un esprit qui peut traverser les murs et est quasi-invulnérable aux attaques physiques.",
+    "weakness": "magic"
+  },
+  "dragon": {
+    "name": "Dragon",
+    "description": "Une créature gigantesque, crachant du feu et très puissante.",
+    "weakness": "physical"
+  },
+  "witch": {
+    "name": "Sorcière",
+    "description": "Une magicienne qui lance des sortilèges dangereux.",
+    "weakness": "physical"
+  }
+}

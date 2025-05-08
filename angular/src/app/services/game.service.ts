@@ -1,13 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, Subject, timer } from 'rxjs';
-import { takeUntil, tap, finalize } from 'rxjs/operators';
-import {
-  TILE_TYPES,
-  CHARACTER_TYPES,
-  ENEMY_DESCRIPTIONS,
-  TILE_DESCRIPTIONS,
-  GAME_ITEMS
-} from '../constants/game-constants';
+import { takeUntil, tap, finalize, take } from 'rxjs/operators';
 import {
   Tile,
   Character,
@@ -21,6 +14,7 @@ import {
   EnemyType
 } from '../types/game-types';
 import { BoardService } from './board.service';
+import { GameDataService, CharacterType, EnemyDescription } from './game-data.service';
 
 // Délais pour les animations (en ms)
 const ANIMATION_DELAYS = {
@@ -77,10 +71,33 @@ export class GameService {
   modalState$ = this.modalStateSubject.asObservable();
   currentTile$ = this.currentTileSubject.asObservable();
 
+  // Data from service
+  private tileTypes: Record<string, TileType> = {};
+  private characterTypes: CharacterType[] = [];
+  private enemyDescriptions: Record<EnemyType, EnemyDescription> = {} as Record<EnemyType, EnemyDescription>;
+  private tileDescriptions: Record<TileType, string> = {} as Record<TileType, string>;
+  private gameItems: Record<string, Item> = {};
+  private dataLoaded = false;
+
   private destroy$ = new Subject<void>();
 
-  constructor(private boardService: BoardService) {
-    this.initializeGame();
+  constructor(
+    private boardService: BoardService,
+    private gameDataService: GameDataService
+  ) {
+    this.loadData();
+  }
+
+  private loadData(): void {
+    this.gameDataService.getAllData().pipe(take(1)).subscribe(data => {
+      this.tileTypes = this.gameDataService.getTileTypes();
+      this.characterTypes = data.characters;
+      this.enemyDescriptions = data.enemies as Record<EnemyType, EnemyDescription>;
+      this.tileDescriptions = data.tiles.descriptions;
+      this.gameItems = data.items;
+      this.dataLoaded = true;
+      this.initializeGame();
+    });
   }
 
   ngOnDestroy() {
@@ -96,7 +113,7 @@ export class GameService {
 
   // Sélection du personnage
   selectCharacter(type: string, color: string): void {
-    const characterType = CHARACTER_TYPES.find(c => c.name === type);
+    const characterType = this.characterTypes.find(c => c.name === type);
     if (characterType) {
       const character: Character = {
         type,
@@ -218,10 +235,10 @@ export class GameService {
 
   // Afficher le modal de la case
   private showTileModal(tile: Tile, position: number): void {
-    const tileDescription = tile.data.description || TILE_DESCRIPTIONS[tile.type];
+    const tileDescription = tile.data.description || this.tileDescriptions[tile.type];
     const hasCompletedTurn = this.hasCompletedOneTurnSubject.value;
 
-    if (tile.type === TILE_TYPES.START && position === 0 && hasCompletedTurn) {
+    if (tile.type === this.tileTypes['START'] && position === 0 && hasCompletedTurn) {
       this.modalStateSubject.next({
         isOpen: true,
         title: 'Victoire !',
@@ -250,13 +267,20 @@ export class GameService {
 
   private getTileModalTitle(tileType: TileType): string {
     const titles: Record<TileType, string> = {
-      [TILE_TYPES.START]: 'Case de départ',
-      [TILE_TYPES.ITEM]: 'Case d\'objet',
-      [TILE_TYPES.ENEMY]: 'Case d\'ennemi',
-      [TILE_TYPES.HEAL]: 'Case de soin',
-      [TILE_TYPES.TRAP]: 'Case piège',
-      [TILE_TYPES.TELEPORT]: 'Case de téléportation',
-      [TILE_TYPES.EMPTY]: 'Case'
+      [this.tileTypes['START']]: 'Case de départ',
+      [this.tileTypes['ITEM']]: 'Case d\'objet',
+      [this.tileTypes['ENEMY']]: 'Case d\'ennemi',
+      [this.tileTypes['HEAL']]: 'Case de soin',
+      [this.tileTypes['TRAP']]: 'Case piège',
+      [this.tileTypes['TELEPORT']]: 'Case de téléportation',
+      [this.tileTypes['EMPTY']]: 'Case',
+      start: '',
+      item: '',
+      enemy: '',
+      heal: '',
+      trap: '',
+      teleport: '',
+      empty: ''
     };
     return titles[tileType];
   }
@@ -267,22 +291,22 @@ export class GameService {
     this.boardSubject.next(board);
 
     switch (tile.type) {
-      case TILE_TYPES.START:
+      case this.tileTypes['START']:
         this.handleStartTileEffect();
         break;
-      case TILE_TYPES.ITEM:
+      case this.tileTypes['ITEM']:
         this.handleItemTileEffect();
         break;
-      case TILE_TYPES.ENEMY:
+      case this.tileTypes['ENEMY']:
         this.handleEnemyTileEffect(tile);
         break;
-      case TILE_TYPES.HEAL:
+      case this.tileTypes['HEAL']:
         this.handleHealTileEffect();
         break;
-      case TILE_TYPES.TRAP:
+      case this.tileTypes['TRAP']:
         this.handleTrapTileEffect();
         break;
-      case TILE_TYPES.TELEPORT:
+      case this.tileTypes['TELEPORT']:
         this.handleTeleportTileEffect(tile);
         break;
       default:
@@ -308,29 +332,22 @@ export class GameService {
   }
 
   private handleItemTileEffect(): void {
-    const itemKeys = Object.keys(GAME_ITEMS);
-    const randomItemKey = itemKeys[Math.floor(Math.random() * itemKeys.length)];
-    const randomItem = {
-      ...GAME_ITEMS[randomItemKey as keyof typeof GAME_ITEMS],
-      effect: {
-        ...GAME_ITEMS[randomItemKey as keyof typeof GAME_ITEMS].effect,
-        currentUses: GAME_ITEMS[randomItemKey as keyof typeof GAME_ITEMS].effect.uses
-      }
-    };
+    // Use the getRandomItem method from GameDataService
+    this.gameDataService.getRandomItem().pipe(take(1)).subscribe(randomItem => {
+      this.inventorySubject.next([...this.inventorySubject.value, randomItem]);
+      this.messageSubject.next(`Vous avez trouvé un(e) ${randomItem.name} !`);
 
-    this.inventorySubject.next([...this.inventorySubject.value, randomItem]);
-    this.messageSubject.next(`Vous avez trouvé un(e) ${randomItem.name} !`);
-
-    setTimeout(() => {
-      this.endTileEffect();
-      this.gameStateSubject.next('playing');
-    }, ANIMATION_DELAYS.TILE_EFFECT);
+      setTimeout(() => {
+        this.endTileEffect();
+        this.gameStateSubject.next('playing');
+      }, ANIMATION_DELAYS.TILE_EFFECT);
+    });
   }
 
   private handleEnemyTileEffect(tile: Tile): void {
     if (tile.data.enemyType) {
       const enemyType = tile.data.enemyType;
-      const enemyInfo = ENEMY_DESCRIPTIONS[enemyType as keyof typeof ENEMY_DESCRIPTIONS];
+      const enemyInfo = this.enemyDescriptions[enemyType];
       const enemyHealth = 50 + Math.floor(Math.random() * 50);
 
       const enemy: Enemy = {
@@ -556,7 +573,7 @@ export class GameService {
         let newHealth = Math.max(0, currentHealth - enemyDamage);
 
         // Effet de vol de vie pour le vampire
-        if (character?.type === 'Vampire') {
+        if (character?.type === 'Vampire' || character?.type === 'vampire') {
           const healAmount = Math.floor(character.baseDamage * 0.3);
           newHealth = Math.min(100, newHealth + healAmount);
           this.messageSubject.next(
@@ -635,7 +652,7 @@ export class GameService {
       isPlayerAttacking: true
     });
 
-    const characterConfig = CHARACTER_TYPES.find(c => c.name === character.type);
+    const characterConfig = this.characterTypes.find(c => c.name === character.type || c.id === character.type);
     if (!characterConfig) return;
 
     const damageMultiplier = this.calculateDamageMultiplier(enemy, character);

@@ -1,0 +1,39 @@
+{
+  "healingPotion": {
+    "id": "healingPotion",
+    "name": "Potion de soin",
+    "type": "potion",
+    "description": "Restaure 30 points de vie.",
+    "effect": {
+      "type": "heal",
+      "value": 30,
+      "uses": 1
+    },
+    "usableInCombat": true,
+    "icon": "❤️"
+  },
+  "sword": {
+    "id": "sword",
+    "name": "Épée magique",
+    "type": "sword",
+    "description": "Augmente les dégâts de 10 points.",
+    "effect": {
+      "type": "damage",
+      "value": 10
+    },
+    "usableInCombat": false,
+    "icon": "⚔️"
+  },
+  "shield": {
+    "id": "shield",
+    "name": "Bouclier",
+    "type": "shield",
+    "description": "Réduit les dégâts reçus de 5 points.",
+    "effect": {
+      "type": "defense",
+      "value": 5
+    },
+    "usableInCombat": false,
+    "icon": "🛡️"
+  }
+}
